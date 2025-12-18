@@ -1,0 +1,80 @@
+{
+  "name": "starship-sheet-module",
+  "title": "Starship Sheet (PDF)",
+  "description": "A Foundry VTT module packaging the Starship PDF sheet for quick access.",
+  "version": "1.0.0",
+  "author": "Samuel",
+  "minimumCoreVersion": "11",
+  "compatibleCoreVersion": "11",
+  "url": "https://github.com/Samuel/starship-sheet-module",
+  "manifest": "https://raw.githubusercontent.com/Samuel/starship-sheet-module/main/module.json",
+  "download": "https://github.com/Samuel/starship-sheet-module/archive/refs/heads/main.zip",
+  "license": "CC-BY-4.0",
+  "esmodules": [],
+  "scripts": [
+    "scripts/open-pdf.js"
+  ],
+  "styles": [
+    "styles/module.css"
+  ],
+  "packs": [],
+  "languages": [],
+  "system": "",
+  "flags": {
+    "starship-sheet": {
+      "pdfPath": "assets/Sheet - Starship.pdf",
+      "pdfFilename": "Sheet - Starship.pdf"
+    }
+  }
+}
+Hooks.once("init", () => {
+  game.settings.register("starship-sheet-module", "pdfPath", {
+    name: "PDF Path",
+    scope: "world",
+    config: false,
+    default: "assets/Sheet - Starship.pdf",
+    type: String
+  });
+});
+
+Hooks.once("ready", () => {
+  const pdfPath = game.settings.get("starship-sheet-module", "pdfPath") || "assets/Sheet - Starship.pdf";
+  const moduleName = "starship-sheet-module";
+
+  // Add a control icon to the left UI to open the PDF in a new tab
+  const btn = $(`<a class="control-icon" title="Open Starship PDF"><i class="fas fa-file-pdf"></i></a>`);
+  btn.on("click", () => {
+    const url = `${window.location.origin}${game.data.baseUrl || ""}/modules/${moduleName}/${pdfPath}`;
+    window.open(url, "_blank");
+  });
+
+  // Append the button to the left controls once the UI exists
+  Hooks.on("renderSidebarTab", () => {
+    if ($("#ui-left .control-icon[title='Open Starship PDF']").length === 0) {
+      $("#ui-left").append(btn);
+    }
+  });
+});
+/* Minimal styling for the module control icon */
+.control-icon[title="Open Starship PDF"] {
+  color: #e74c3c;
+}
+.control-icon[title="Open Starship PDF"]:hover {
+  color: #c0392b;
+}
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Starship Sheet</title>
+  <style>
+    html,body { height:100%; margin:0; background:#111; color:#fff; }
+    .pdf-frame { width:100%; height:100vh; border:none; }
+    .notice { padding:8px; font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial; }
+  </style>
+</head>
+<body>
+  <div class="notice">If the PDF does not display, open the file directly from the module folder.</div>
+  <iframe class="pdf-frame" src="assets/Sheet - Starship.pdf"></iframe>
+</body>
+</html>
